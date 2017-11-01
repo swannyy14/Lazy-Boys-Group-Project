@@ -35,6 +35,8 @@ congress_reg <- regexpr('(House|Senate)?\\s?@\\w+', congress_tweets_string)
 
 #names of the members
 
+
+#IMPORTANT: the function doesn't work as intended. (need to strip the jr.sr parts)
 strip_whitespace <- function(x){ #function that removes whitespace from the edge
   rm1 <- gsub('^\\s+','',x)
   rm2 <- gsub('\\s+$','',rm1)
