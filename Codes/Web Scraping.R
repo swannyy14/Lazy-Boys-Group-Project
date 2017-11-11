@@ -3,121 +3,104 @@
 library(rvest)
 library(dplyr)
 library(stringi)
+library(twitteR)
 
-#list of senators and their twitter accounts
-# sen_twitter_url <- 'https://www.birdsonganalytics.com/blog/2017/02/21/full-list-of-us-senators-on-twitter-2017/'
-# sen_web <- read_html(sen_twitter_url)
-#  
-# sen_twitter_table <- html_nodes(sen_web,'table') %>% html_table() %>% as.data.frame()
-# sen_twitter_table <- transform.data.frame(sen_twitter_table, Twitter.Handle = paste0('@', Twitter.Handle))
-# saveRDS(sen_twitter_table, 'sen_twitter_table.rds')
-
+##### No need to run this code again (have the object saved)
+# # list of senators and their twitter accounts
+# # sen_twitter_url <- 'https://www.birdsonganalytics.com/blog/2017/02/21/full-list-of-us-senators-on-twitter-2017/'
+# # sen_web <- read_html(sen_twitter_url)
+# # 
+# # sen_twitter_table <- html_nodes(sen_web,'table') %>% html_table() %>% as.data.frame()
+# # sen_twitter_table <- transform.data.frame(sen_twitter_table, Twitter.Handle = paste0('@', Twitter.Handle))
+# # saveRDS(sen_twitter_table, 'sen_twitter_table.rds')
+# 
 sen_twitter_table <- readRDS('sen_twitter_table.rds')
 
-#house of representatives
-#might be uselss
-# congress_url <- 'https://resist.blog/us-house-representatives-twitter-list/'
-# congress_web <- read_html(congress_url)
-# 
-# congress_url <- html_nodes(congress_web, 'td')
-# 
-# congress_messy <- html_text(congress_url)
-# congress_messy <- congress_messy[-which(congress_messy == '')]
-# 
-# #extract the state names, and associate each congress member by state
-# state_index <- grep('^(north|south|rhode|new|west)?\\s?\\w+$', congress_messy, ignore.case = TRUE)
-# state_iteration <- state_index[-1] - state_index[-length(state_index)] - 1 #number of times each state should be repeated
-# state_iteration <- c(state_iteration, length(congress_messy) - state_index[length(state_index)])
-# state_col <- unname(unlist(mapply(rep, congress_messy[state_index], state_iteration))) #state column
-# 
-# #start extracting names, twitter account, house or senate
-# congress_tweets_string <- congress_messy[-state_index]
-# congress_tweets_string <- gsub('\\n',' ',congress_tweets_string)
-# 
-# # testt <- grep('samuel', congress_tweets_string, ignore.case = TRUE, value = TRUE)
-# # 
-# # hello <- regexpr('(House|Senate)?\\s?@\\w+', testt)
-# # 
-# # substr(testt,1,hello-1)
-# 
-# congress_reg <- regexpr('(House|Senate)?\\s?@\\w+', congress_tweets_string)
-# #congress_tweets_string[214]
-# #names of the members
-# 
-# 
-# strip_whitespace <- function(x){ #function that removes whitespace from the edge
-#   rm1 <- gsub('^\\s+','',x)
-#   rm2 <- gsub('\\s+$','',rm1)
-#   return(rm2)
-# }
-# member_names <- substr(congress_tweets_string, 1, congress_reg-1) %>%
-#   gsub('Rep.','',.) %>% gsub('[.\'?!,]', ' ', .) %>% gsub(' (jr|sr) ', '', .,ignore.case = TRUE) %>% strip_whitespace() 
-# member_info <- regmatches(congress_tweets_string, congress_reg) %>% strsplit('@')
-# h_or_s <- do.call(rbind, member_info)[,1] %>% strip_whitespace()
-# twitter_handle <- paste0('@',do.call(rbind, member_info)[,2])
-# 
-# #data frame for tidied data
-# house_twitter_table <- data.frame(state_col, 'h_or_s' = h_or_s, Twitter.Handle = twitter_handle,
-#                               Real.Name = member_names, stringsAsFactors = FALSE) %>%
-#   filter(h_or_s != 'Senate')
-# 
-# #members that did not get classified in House or Senate (missing value)
-# undef_twitter <- house_twitter_table$Twitter.Handle[house_twitter_table$h_or_s == '']
-# sen_twitter <- sen_twitter_table$Twitter.Handle
-# 
-# #get rid of members that coincide with the senate table
-# duplicate_member <- character(0)
-# for (i in undef_twitter){
-#   if (i %in% sen_twitter){
-#     duplicate_member <- c(duplicate_member, i)
-#   }
-# }
-# 
-# #simplify names to first and last name
-# #IMPORTANT: the function doesn't work as intended. (need to strip the jr.sr parts)
-# 
-# first_and_last <- function(full_name){
-#   first_name <- regmatches(full_name, regexpr('^\\w+', full_name))
-#   last_name <- regmatches(full_name, regexpr('\\w+$', full_name))
-#   return(paste(first_name, last_name))
-# }
-# # 
-# # namesss <- house_twitter_table$Real.Name[c(72,178,320,420)]
-# # 
-# # first_and_last(namesss)
-# 
-# heremaybe <- house_twitter_table %>% filter(!(Twitter.Handle %in% duplicate_member)) %>% 
-#   mutate(h_or_s = 'House', Real.Name = first_and_last(Real.Name))
-# 
-# comparetwo <- data.frame(heremaybe$Real.Name, house_twitter_table$Real.Name)
-# 
-# house_twitter_table <- house_twitter_table %>% filter(!(Twitter.Handle %in% duplicate_member)) %>% 
-#   mutate(h_or_s = 'House', Real.Name = first_and_last(Real.Name))
-# 
-# #get rid of special characters (for some reason if I put it in a function it returns wacky characters)
-# house_twitter_table$Real.Name <- stri_trans_general(house_twitter_table$Real.Name, "Latin-ASCII")
-# 
-# #associate each house member with a party
-
-#found better file
 #install.packages("pdftools")
-library(pdftools)
-house_twit <- read.csv('congress_twitter_acc.csv', header = TRUE, 
+#library(pdftools)
+house_twit_df <- read.csv('congress_twitter_acc.csv', header = TRUE, 
                        stringsAsFactors = FALSE, skip = 2, encoding = 'UTF-8')
-house_twit$Representative <- stri_trans_general(house_twit$Representative, "Latin-ASCII")
-no_twit_acc <- c(1:nrow(house_twit))[-grep('@',house_twit$Twitter.Handle)]
-house_twit[no_twit_acc,]
-house_twit$Representative[337] <- paste(house_twit$Representative[337], 'Cartwright')
-house_twit$Twitter.Handle[360] <- paste0('@', house_twit$Twitter.Handle[360])
-house_twit$Twitter.Handle[422] <- paste0('@', house_twit$Twitter.Handle[422])
+house_twit_df$Representative <- stri_trans_general(house_twit_df$Representative, "Latin-ASCII")
+no_twit_acc <- c(1:nrow(house_twit_df))[-grep('@',house_twit_df$Twitter.Handle)]
+house_twit_df[no_twit_acc,]
+house_twit_df$Representative[337] <- paste(house_twit_df$Representative[337], 'Cartwright')
+house_twit_df$Twitter.Handle[360] <- paste0('@', house_twit_df$Twitter.Handle[360])
+house_twit_df$Twitter.Handle[422] <- paste0('@', house_twit_df$Twitter.Handle[422])
 
-no_twit_acc <- c(1:nrow(house_twit))[-grep('@',house_twit$Twitter.Handle)]
-house_twit <- house_twit[-no_twit_acc,]
+no_twit_acc <- c(1:nrow(house_twit_df))[-grep('@',house_twit_df$Twitter.Handle)]
+house_twit_df <- house_twit_df[-no_twit_acc,]
 
-repr <- gregexpr('^\\w+', house_twit$Representative)
-unique(regmatches(house_twit$Representative,repr))
+repr <- gregexpr('^\\w+', house_twit_df$Representative)
+unique(regmatches(house_twit_df$Representative,repr))
 
-house_twit$Representative <- gsub('representative', '', house_twit$Representative, ignore.case = TRUE)
-house_twit$Representative <- gsub('delegate', '', house_twit$Representative, ignore.case = TRUE)
+house_twit_df$Representative <- gsub('representative', '', house_twit_df$Representative, ignore.case = TRUE)
+house_twit_df$Representative <- gsub('delegate', '', house_twit_df$Representative, ignore.case = TRUE)
 
+#this data frame contains STATE, HOUSE OF REP NAME, TWITTER HANDLE
+head(house_twit_df)
+
+##Now, try to extract the House of Rep's Political Party
+# house_party_url <- 'https://en.wikipedia.org/wiki/115th_United_States_Congress'
+# house_party_url %>% read_html() %>% 
+#   html_nodes('#mw-content-text > div > div:nth-child(60) > table') %>%
+#   html_text() %>% strsplit('\\n') -> house_party
+# 
+# house_party <- house_party[[1]][-c(which(house_party[[1]] == ''),558,549,545,542,535,531,528,523,516)]
+# 
+# h_state_index <- grep('\\w+\\[edit\\]', house_party)
+# house_by_party <- house_party[seq_along(house_party)[-h_state_index]]
+# 
+# house_states <- house_party[h_state_index] %>% gsub('\\[edit\\]','',., ignore.case = TRUE)
+# house_state_col <- mapply(rep,house_states,c(h_state_index[2:length(h_state_index)],
+#                                              length(house_party)+1) - h_state_index - 1) %>%
+#   unlist() %>% unname()
+# house_party_df <- data.frame(State = house_state_col, house_by_party)
+# saveRDS(house_party_df, 'house_party_df.rds')
+
+house_party_df <- readRDS('house_party_df.rds')
+
+##extract tweets for the senators
+# sen_twitter <- sen_twitter_table$Twitter.Handle %>% gsub('@','',.)
+# sen_tweets <- list()
+# 
+# userTimeline('RepZoeLofgren', n = 20, since = '2017-11-05')
+# for (i in sen_twitter){
+#   sen_tweets[[i]] <- userTimeline(i, n = 20, since = '2017-11-05')
+# }
+# 
+# saveRDS(sen_tweets, 'sen_tweets.rds')
+
+
+#start mining twitter data
+library(twitteR)
+
+api_key <- '2Sxgqqf0fpfFzjUCwoxfkQiMa'
+api_secret <- 'RquO4sxeLBp8o9yZH9I5haeyckY9dfTJb7mX180JjRZKV1Z4iQ'
+access_token <- '142134584-ULO3fBv7P96tPlnln8kclhA0oVSgIWKsktAUMZvQ'
+access_token_secret <- 'wKbTK1icm333EbAZvUNJ3euxQ9Pw75Fnhea8y8lZHjTKO'
+setup_twitter_oauth(consumer_key = api_key, consumer_secret = api_secret)
+
+sen_tweets <- readRDS('sen_tweets.rds')
+sum(lapply(sen_tweets,length))
+
+str(sen_tweets)
+
+## of tweets for the senator
+do.call(sum,lapply(sen_tweets,length))
+
+as.data.frame(sen_tweets[[1]][1])
+str(sen_tweets[[1]][1])
+
+
+#extract tweets for the house members
+# house_twitter <- house_twit_df$Twitter.Handle %>% gsub('@','',.)
+# house_tweets <- list()
+# for (acc in house_twitter){
+#   house_tweets[[acc]] <-
+#     tryCatch(tryCatch({userTimeline(acc,n = 20,since = '2017-11-05')}, error = function(a){return(NA)}))
+# }
+#saveRDS(house_tweets, 'house_tweets.rds')
+
+house_tweets <- readRDS('house_tweets.rds')
+do.call(sum, lapply(house_tweets,length))
 
