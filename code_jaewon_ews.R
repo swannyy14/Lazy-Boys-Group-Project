@@ -77,6 +77,16 @@ massshooting_6_7 <- twListToDF(massshooting_6_7)
 write.csv(massshooting_5_6,'massshooting_5_6.csv')
 write.csv(massshooting_6_7,'massshooting_6_7.csv')
 
+
+sutherlandsprings_5_6 <- searchTwitter("sutherlandsprings", since = '2017-11-05', until = '2017-11-06', n=20000)
+sutherlandsprings_5_6 <- twListToDF(sutherlandsprings_5_6)
+
+sutherlandsprings_6_7 <- searchTwitter("sutherlandsprings", since = '2017-11-06', until = '2017-11-07', n=20000)
+sutherlandsprings_6_7 <- twListToDF(sutherlandsprings_6_7)
+
+write.csv(sutherlandsprings_5_6,'sutherlandsprings_5_6.csv')
+write.csv(sutherlandsprings_6_7,'sutherlandsprings_6_7.csv')
+
 guncontrolnow_4_5 <- searchTwitter("guncontrolnow", since = '2017-11-04 ', until = '2017-11-05', n=32000)
 guncontrolnow_4_5 <- twListToDF(guncontrolnow_4_5)
 
