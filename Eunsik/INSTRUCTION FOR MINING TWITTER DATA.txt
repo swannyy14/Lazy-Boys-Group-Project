@@ -22,3 +22,5 @@ Also, at the end, if you want to make sure that you have indeed saved the data f
 a code something along the lines of:
 
 check_df <- readRDS('THE FILE NAME.rds')
+
+At the end, make sure the commit and push to github!!!!!
