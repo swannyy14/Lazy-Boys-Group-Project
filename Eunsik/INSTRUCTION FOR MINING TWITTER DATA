@@ -1,0 +1,24 @@
+Now that all of us have the twitter api set up, we have what we need to mine the twitter data.
+
+Run the first few lines of code. That ensures that the working directory is in your assigned folder so as to avoid
+potential confusion when we're organizing files.
+
+Basically copy and paste your API Key, API Secret, Access Token, and Access Secret to Corresponding Variables.
+Run the code that sets up the twitter api. DO NOT RUN THE WHOLE CODE. 
+
+After that you'll have to run the code that is designated for you. 
+
+Eunsik - you just have to run the top portion. 
+
+Jaewon, Neel - you have two lines to uncomment:
+1. uncomment the line with the house index
+2. uncomment the line which saves the tweets into the folder
+
+Then run the rest of the assigned code.
+
+It should take some time to run certain parts of the code.
+
+Also, at the end, if you want to make sure that you have indeed saved the data frame as a final product, run
+a code something along the lines of:
+
+check_df <- readRDS('THE FILE NAME.rds')
