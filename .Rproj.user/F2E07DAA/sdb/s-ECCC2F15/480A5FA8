@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(twitteR)\nlibrary(devtools)\nlibrary(ROAuth)\nlibrary(openssl)\nlibrary(httpuv)\nlibrary(base64enc)\n\ndownload.file(url=\"http://curl.haxx.se/ca/cacert.pem\",destfile=\"cacert.pem\")\noptions(RCurlOptions = list(cainfo = system.file(\"CurlSSL\", \"./cacert.pem\", package = \"RCurl\")))\n\n\n#My twitter application OAuth info (https://dev.twitter.com/apps)\nreqURL <- \"https://api.twitter.com/oauth/request_token\"        #The URL provided for retrieving request tokens\naccessURL <- \"https://api.twitter.com/oauth/access_token\"      #The URL provided for retrieving acess tokens\nauthURL <- \"https://api.twitter.com/oauth/authorize\"           #The URL provided for authorization/verification purposes \nconsumerKey <- \"LY3wYeXrybGmNAG1BcR8G17z6\"                     #웹에서 확인한 자신의 consumerKey를 입력\nconsumerSecret <- \"zAjLbSs97oiyuhcToD3LV5Lh9OQyUsUgIXVeyMMHYTfq5NT5pB\" #웹에서 확인한 자신의 consumerSecret을 입력\naccessToken <- \"917393984288448513-KCtszTWxvV1ZZk0sIGJM8oIpkOi729y\"\naccessSecret <- \"adLVekMFnTlPGYXoXXpJhR4vi3nOQDyPw33HRAKZ7E8EH\"\n\nsetup_twitter_oauth(consumerKey,consumerSecret)\n\n#http://thinktostart.com/twitter-authentification-with-r/\n\n\n\nsearchTwitter(\"Go Illini\")\n\n\ntest_tw <- searchTwitter(\"prayfortexas\", since = '2017-11-05 00:00:00', until = '2017-11-05 12:00:00', n=3200)\ntest_tw <- searchTwitter(\"prayfortexas\", since = '2017-11-04', until = '2017-11-05', n=3200)\ntest_tw <- twListToDF(test_tw)\n\n\nextract.hashes = function(vec){\n  \n  hash.pattern = \"#[[:alpha:]]+\"\n  have.hash = grep(x = vec, pattern = hash.pattern)\n  \n  hash.matches = gregexpr(pattern = hash.pattern,\n                          text = vec[have.hash])\n  extracted.hash = regmatches(x = vec[have.hash], m = hash.matches)\n  \n  df = data.frame(table(tolower(unlist(extracted.hash))))\n  colnames(df) = c(\"tag\",\"freq\")\n  df = df[order(df$freq,decreasing = TRUE),]\n  return(df)\n}\n\n#https://www.r-bloggers.com/using-r-to-find-obamas-most-frequent-twitter-hashtags/\n\n\n\ntest_tw <- userTimeline(\"BarackObama\", n = 3200)\ntest_tw <- twListToDF(test_tw)\nvec1 <- test_tw$text\n\ndat <- head(extract.hashes(vec1),50)\ndat2 <- transform(dat, tag = reorder(tag, freq))\n\n\nlibrary(ggplot2)\n\np = ggplot(dat2, aes(x = tag, y = freq)) + geom_bar(stat = \"identity\", fill = \"blue\")\np = p + coord_flip() + labs(title = \"Hashtag frequencies in the tweets of the Obama team (@BarackObama)\")\np\n\n#UsefulWebsites______________________________________________________________________________________________\n\n#http://rstatistics.net/extracting-tweets-with-r/\n\n#__________________________________________________________________________________________________________\ntest_tw <- userTimeline(\"realDonaldTrump\", n = 3200)\ntest_tw <- twListToDF(test_tw)\nvec1 <- test_tw$text\n\ndat <- head(extract.hashes(vec1),50)\ndat2 <- transform(dat, tag = reorder(tag, freq))\n\np = ggplot(dat2, aes(x = tag, y = freq)) + geom_bar(stat = \"identity\", fill = \"blue\")\np = p + coord_flip() + labs(title = \"Hashtag frequencies in the tweets of the Trump team (@realDonaldTrump)\")\np\n\n\nsearchTwitter(\"hi\", since='2017-10-01', until='2017-10-10')\n\n",
+    "created" : 1510518196275.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2131080995",
+    "id" : "480A5FA8",
+    "lastKnownWriteTime" : 1510518186,
+    "last_content_update" : 1510518186,
+    "path" : "//ad.uillinois.edu/engr/instructional/jaewonc3/Downloads/STAT385 Statistical Programming Method/Lazy-Boys-Group-Project/code_jaewon.R",
+    "project_path" : "code_jaewon.R",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

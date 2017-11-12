@@ -1,0 +1,28 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1510520205625.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "7DE5BB3A",
+    "lastKnownWriteTime" : 7308604914264011873,
+    "last_content_update" : 1510520205625,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "swq7lc8llt",
+        "caption" : "prayfortexas_4_5",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=prayfortexas_4_5&cache_key=swq7lc8llt",
+        "displayedObservations" : 10,
+        "environment" : "",
+        "object" : "prayfortexas_4_5",
+        "totalObservations" : 10,
+        "variables" : 16
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
