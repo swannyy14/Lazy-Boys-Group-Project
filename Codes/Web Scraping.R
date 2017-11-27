@@ -63,9 +63,8 @@ house_party_df <- readRDS('house_party_df.rds')
 # sen_twitter <- sen_twitter_table$Twitter.Handle %>% gsub('@','',.)
 # sen_tweets <- list()
 # 
-# userTimeline('RepZoeLofgren', n = 20, since = '2017-11-05')
 # for (i in sen_twitter){
-#   sen_tweets[[i]] <- userTimeline(i, n = 20, since = '2017-11-05')
+#   sen_tweets[[i]] <- userTimeline(i, n = 20)
 # }
 # 
 # saveRDS(sen_tweets, 'sen_tweets.rds')
@@ -88,9 +87,6 @@ str(sen_tweets)
 ## of tweets for the senator
 do.call(sum,lapply(sen_tweets,length))
 
-as.data.frame(sen_tweets[[1]][1])
-str(sen_tweets[[1]][1])
-
 
 #extract tweets for the house members
 # house_twitter <- house_twit_df$Twitter.Handle %>% gsub('@','',.)
@@ -102,5 +98,9 @@ str(sen_tweets[[1]][1])
 #saveRDS(house_tweets, 'house_tweets.rds')
 
 house_tweets <- readRDS('house_tweets.rds')
-do.call(sum, lapply(house_tweets,length))
+#get rid of empty twitter accounts
+house_tweets <- house_tweets[which(!(is.na(house_tweets) | sapply(house_tweets, length) == 0))] 
+
+house_tweets_df <- lapply(house_tweets, twListToDF) %>% do.call(rbind,.)
+
 
