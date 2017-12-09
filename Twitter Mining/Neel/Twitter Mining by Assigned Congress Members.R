@@ -64,14 +64,33 @@ house_index_break <- length(house_twit_df$Twitter.Handle) %/% 3
 
 # extract tweets for the house members
 house_twitter <- house_twit_df$Twitter.Handle %>% gsub('@','',.)
-house_tweets <- list()
-for (acc in house_index){
-  house_tweets[[house_twitter[acc]]] <-
-    tryCatch(tryCatch({userTimeline(house_twitter[acc],n = 150)},
-                      error = function(a){return(NA)}))
+
+get_tweets <- function(twitterAccs, n = 150, delete_nonExist = TRUE, delete_empty = TRUE){
+  #function that retrieves tweets from twitter accounts, and if the provided twitter account
+  #if delete_nonExist is TRUE, then delete non-existent accounts from the returned list
+  #if delete_empty is TRUE, then delete empty twitter accounts
+  require(twitteR)
+  tweets_list <- list()
+  for (acc in twitterAccs){
+    tweets_list[[twitterAccs[acc]]] <-
+      tryCatch({userTimeline(twitterAccs[acc], n)},
+               error = function(a){ return (NA) })
+  }
+  if (delete_nonExist){
+    tweets_list <- tweets_list[which(!is.na(tweets_list))]
+  }
+  if (delete_empty){
+    tweets_list <- tweets_list[which(sapply(house_tweets, length) == 0)]
+  }
+  return(tweets_list)
 }
 
-house_tweets_df <- do.call(rbind.data.frame,lapply(house_tweets,twListToDF))
+house_tweets <- get_tweets(house_twitter)
+
+# house_tweets <- house_tweets[which(!(is.na(house_tweets) | sapply(house_tweets, length) == 0))] 
+
+house_tweets_df <- lapply(house_tweets, twListToDF) %>% do.call(rbind,.)
+
 rownames(house_tweets_df) <- NULL
 
 ## MAKE SURE TO UNCOMMENT THE CORRECT LINE TO SAVE THE FILE

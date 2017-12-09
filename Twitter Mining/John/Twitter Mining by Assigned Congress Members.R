@@ -97,4 +97,4 @@ rownames(house_tweets_df) <- NULL
 
 # saveRDS(house_tweets_df, 'neel_house_tweets.rds') #NEEL
 # saveRDS(house_tweets_df, 'jaewon_house_tweets.rds') #JAEWON
-saveRDS(house_tweets_df, 'john_house_tweets.rds') #JOHN
+# saveRDS(house_tweets_df, 'john_house_tweets.rds') #JOHN
