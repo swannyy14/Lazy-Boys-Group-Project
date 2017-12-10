@@ -8,10 +8,10 @@ library(twitteR)
 library(dplyr)
 library(stringi)
 
-api_key <- 'PUT YOUR API KEY HERE'
-api_secret <- 'PUT YOUR API SECRET HERE'
-access_token <- 'PUT YOUR ACCESS TOKEN HERE'
-access_token_secret <- 'PUT YOUR ACCESS TOKEN SECRET HERE'
+api_key <- 'MPuiHGiQdRVuO1iuk1YMVwW51'
+api_secret <- '6vUyz5506Th2uiqRisCkLfFk8iFfDb8YnKdI9u3BiXacoQZf5G'
+access_token <- '929497181282885632-r049pZNbL7RDdHHeLM6Xxazwp0RBYOK'
+access_token_secret <- '4I7gAxestHigXDin9nJX11HECa8EZMZhVns6HbLSSzC3p'
 setup_twitter_oauth(consumer_key = api_key, consumer_secret = api_secret)
 
 ############################## FOR EUNSIK ##############################
@@ -35,7 +35,9 @@ sen_tweets_df <- lapply(sen_tweets,
                         function(x) pickDate(twListToDF(x))) %>% do.call(rbind,.)
 
 rownames(sen_tweets_df) <- NULL
-saveRDS(sen_tweets, 'sen_tweets.rds')
+saveRDS(sen_tweets_df, 'sen_tweets.rds')
+check_df <- readRDS('sen_tweets.rds')
+head(check_df)
 
 ############################## FOR NEEL, JAEWON, JOHN ##############################
 ##HOUSE OF REP
