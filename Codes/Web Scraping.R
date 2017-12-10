@@ -89,13 +89,16 @@ do.call(sum,lapply(sen_tweets,length))
 
 
 #extract tweets for the house members
-# house_twitter <- house_twit_df$Twitter.Handle %>% gsub('@','',.)
-# house_tweets <- list()
-# for (acc in house_twitter){
-#   house_tweets[[acc]] <-
-#     tryCatch(tryCatch({userTimeline(acc,n = 20,since = '2017-11-05')}, error = function(a){return(NA)}))
-# }
-#saveRDS(house_tweets, 'house_tweets.rds')
+house_twitter <- house_twit_df$Twitter.Handle %>% gsub('@','',.)
+house_tweets <- list()
+
+house_twitter1 <- house_twitter[1:10]
+
+for (acc in house_twitter1){
+  house_tweets[[acc]] <-
+    tryCatch({userTimeline(acc,n = 20,since = '2017-11-05')}, error = function(a){return(NA)})
+}
+saveRDS(house_tweets, 'house_tweets.rds')
 
 house_tweets <- readRDS('house_tweets.rds')
 #get rid of empty twitter accounts
