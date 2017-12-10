@@ -13,7 +13,7 @@ Eunsik - you just have to run the top portion.
 Jaewon, Neel - you have three lines to uncomment:
 1. uncomment the line with the house index (one of the lines in between 57 to 64)
 2. uncomment the line which saves the list of tweets into the folder (one of line 90, 91, 92)
-2. uncomment the line which saves the tweets into the folder (one of 118, 119, 120)
+2. uncomment the line which saves the tweets into the folder (one of 117, 118, 119)
 
 
 Then run the rest of the assigned code.
