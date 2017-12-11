@@ -104,3 +104,48 @@ house_party_df$Representative <-
   gsub('^[:space:]+', '', .) %>%
   gsub('[:space:]+$', '', .) %>%
   gsub(' jr$', '', ., ignore.case = TRUE)
+
+#########################START CLEANING DF#########################
+
+#Unfactorize Column
+house_party_df<-data.frame(lapply(house_party_df,as.character),stringsAsFactors = FALSE)
+
+#Replace State name with abbreviation
+for(i in seq_along(state.name)){
+  house_party_df[house_party_df[, 1] == state.name[i], 1] = state.abb[i]
+}
+
+#Factorize State
+house_party_df$State<-as.factor(house_party_df$State)
+house_twit_df$State<-as.factor(house_twit_df$State)
+
+#Party DF name parsing
+party_full_name <- house_party_df$Representative
+party_full_name<-sub("'", "", party_full_name)
+party_first <- sub("[[:space:]].*", "", party_full_name)
+party_middle_last <- sub("^[[:alpha:]]*[[:space:]]", "", party_full_name)
+party_middle <- sub("[[:alpha:]]+$", "", party_middle_last)
+party_last <- sub("^[[:alpha:]]+[[:space:]]", "", party_middle_last)
+party_last <- sub("^[[:alpha:]]+[[:punct:]]", "", party_last)
+
+#Twit DF name parsing
+twit_full_name <- house_twit_df$Representative
+twit_full_name<-sub("'", "", twit_full_name)
+twit_first <- sub("[[:space:]].*", "", twit_full_name)
+twit_middle_last <- sub("^[[:alpha:]]*[[:space:]]", "", twit_full_name)
+twit_middle <- sub("[[:alpha:]]+$", "", twit_middle_last)
+twit_last <- sub("^[[:alpha:]]+[[:space:]]", "", twit_middle_last)
+twit_last <- sub("^[[:alpha:]]+[[:punct:]]", "", twit_last)
+
+#Divide Name Column
+house_party_df<-data.frame(State=house_party_df$State, First = party_first, Last = party_last, Party = house_party_df$Party)
+house_twit_df<-data.frame(State=house_twit_df$State, First = twit_first, Last = twit_last, Twitter.Handle = house_twit_df$Twitter.Handle)
+
+#FULL JOIN
+house_party_tweet <- dplyr::full_join(house_party_df, house_twit_df, by = c("State","Last"))
+
+#Arrange to look for inaccurate name
+house_party_tweet_arr <- arrange(house_party_tweet, State, Last, First.x, First.y, Twitter.Handle)
+
+#NA.omit
+house_party_tweet_arr <- na.omit(house_party_tweet_arr)
