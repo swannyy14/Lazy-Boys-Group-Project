@@ -23,13 +23,24 @@ sen_twitter <- sen_twitter_table$Twitter.Handle %>% gsub('@','',.)
 sen_tweets <- list()
 
 for (i in sen_twitter){
-  sen_tweets[[i]] <- userTimeline(i, n = 150)
+  sen_tweets[[i]] <- userTimeline(i, n = 100)
 }
 
-sen_tweets_df <- do.call(rbind.data.frame, lapply(sen_tweets,twListToDF))
-rownames(sen_tweets_df) <- NULL
-saveRDS(sen_tweets, 'sen_tweets.rds')
+pickDate <- function(twitter_df, start_time = "2017-11-05 06:00:00 UTC", end_time = "2017-11-07 11:59:59 UTC"){
+  times <- strptime(twitter_df$created, format = "%Y-%m-%d %H:%M:%S", tz = 'UTC')
+  twitter_df[which((times >= start_time) & (times <= end_time)),]
+}
 
+sen_tweets_df <- lapply(sen_tweets,
+                        function(x) pickDate(twListToDF(x))) %>% do.call(rbind,.)
+
+
+rownames(sen_tweets_df) <- NULL
+saveRDS(sen_tweets_df, 'sen_tweets.rds')
+check_df <- readRDS('sen_tweets.rds')
+head(check_df)
+
+grep("shooting", check_df$text, value=TRUE,ignore.case = TRUE)
 
 ############################## FOR NEEL, JAEWON, JOHN ##############################
 ##HOUSE OF REP
