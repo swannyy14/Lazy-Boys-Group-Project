@@ -33,15 +33,21 @@ house_twit_df <- house_twit_df[-no_twit_acc,]
 repr <- gregexpr('^\\w+', house_twit_df$Representative)
 unique(regmatches(house_twit_df$Representative,repr))
 
-house_twit_df$Representative <- gsub('representative', '', house_twit_df$Representative, ignore.case = TRUE)
-house_twit_df$Representative <- gsub('delegate', '', house_twit_df$Representative, ignore.case = TRUE)
+#from the names column, rid of all the unnecessary characters, spaces, and symbols
+house_twit_df$Representative <- house_twit_df$Representative %>%
+  gsub('representative', '', ., ignore.case = TRUE) %>%
+  gsub('delegate', '', ., ignore.case = TRUE) %>%
+  gsub('^ ', '',.) %>%
+  gsub('\\n',' ',.)
+
+house_twit_df$Representative <- stri_trans_general(house_twit_df$Representative, "Latin-ASCII")
 
 #this data frame contains STATE, HOUSE OF REP NAME, TWITTER HANDLE
 head(house_twit_df)
 
-##Now, try to extract the House of Rep's Political Party
+# #Now, try to extract the House of Rep's Political Party
 # house_party_url <- 'https://en.wikipedia.org/wiki/115th_United_States_Congress'
-# house_party_url %>% read_html() %>% 
+# house_party_url %>% read_html() %>%
 #   html_nodes('#mw-content-text > div > div:nth-child(60) > table') %>%
 #   html_text() %>% strsplit('\\n') -> house_party
 # 
@@ -58,52 +64,23 @@ head(house_twit_df)
 # saveRDS(house_party_df, 'house_party_df.rds')
 
 house_party_df <- readRDS('house_party_df.rds')
+colnames(house_party_df)[2] <- "Representative"
+house_party_df$Representative <- as.character(house_party_df$Representative)
+house_party_df$Representative[c(443,444,445,446,447,448)] <- c("Amata Coleman Radewagen", "Eleanor Holmes Norton",
+                                                 "Madeleine Bordallo", "Gregorio Sablan", "Jenniffer Gonzalez",
+                                                 "Stacey Plaskett")
 
-##extract tweets for the senators
-# sen_twitter <- sen_twitter_table$Twitter.Handle %>% gsub('@','',.)
-# sen_tweets <- list()
-# 
-# for (i in sen_twitter){
-#   sen_tweets[[i]] <- userTimeline(i, n = 20)
-# }
-# 
-# saveRDS(sen_tweets, 'sen_tweets.rds')
+#rid of special accented characters
+house_party_df$Representative <- stri_trans_general(house_party_df$Representative, "Latin-ASCII")
 
-
-#start mining twitter data
-library(twitteR)
-
-api_key <- '2Sxgqqf0fpfFzjUCwoxfkQiMa'
-api_secret <- 'RquO4sxeLBp8o9yZH9I5haeyckY9dfTJb7mX180JjRZKV1Z4iQ'
-access_token <- '142134584-ULO3fBv7P96tPlnln8kclhA0oVSgIWKsktAUMZvQ'
-access_token_secret <- 'wKbTK1icm333EbAZvUNJ3euxQ9Pw75Fnhea8y8lZHjTKO'
-setup_twitter_oauth(consumer_key = api_key, consumer_secret = api_secret)
-
-sen_tweets <- readRDS('sen_tweets.rds')
-sum(lapply(sen_tweets,length))
-
-str(sen_tweets)
-
-## of tweets for the senator
-do.call(sum,lapply(sen_tweets,length))
+house_party_df$Representative <- 
+  house_party_df$Representative %>%
+  gsub(' \\([RDI]\\)(.)+', '', .) %>%
+  gsub('[\\(\\)RDI .]+$', '', .) %>%
+  gsub('at-large', '', ., ignore.case = TRUE) %>%
+  gsub('^[^[:alpha:]]+','',.)
+  
+  
 
 
-#extract tweets for the house members
-house_twitter <- house_twit_df$Twitter.Handle %>% gsub('@','',.)
-house_tweets <- list()
-
-house_twitter1 <- house_twitter[1:10]
-
-for (acc in house_twitter1){
-  house_tweets[[acc]] <-
-    tryCatch({userTimeline(acc,n = 20,since = '2017-11-05')}, error = function(a){return(NA)})
-}
-saveRDS(house_tweets, 'house_tweets.rds')
-
-house_tweets <- readRDS('house_tweets.rds')
-#get rid of empty twitter accounts
-house_tweets <- house_tweets[which(!(is.na(house_tweets) | sapply(house_tweets, length) == 0))] 
-
-house_tweets_df <- lapply(house_tweets, twListToDF) %>% do.call(rbind,.)
-
-
+fuckk <- house_party_df

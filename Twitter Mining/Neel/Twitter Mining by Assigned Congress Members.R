@@ -8,10 +8,10 @@ library(twitteR)
 library(dplyr)
 library(stringi)
 
-api_key <- 'PUT YOUR API KEY HERE'
-api_secret <- 'PUT YOUR API SECRET HERE'
-access_token <- 'PUT YOUR ACCESS TOKEN HERE'
-access_token_secret <- 'PUT YOUR ACCESS TOKEN SECRET HERE'
+api_key <- '2Sxgqqf0fpfFzjUCwoxfkQiMa'
+api_secret <- 'RquO4sxeLBp8o9yZH9I5haeyckY9dfTJb7mX180JjRZKV1Z4iQ'
+access_token <- '142134584-ULO3fBv7P96tPlnln8kclhA0oVSgIWKsktAUMZvQ'
+access_token_secret <- 'wKbTK1icm333EbAZvUNJ3euxQ9Pw75Fnhea8y8lZHjTKO'
 setup_twitter_oauth(consumer_key = api_key, consumer_secret = api_secret)
 
 ############################## FOR EUNSIK ##############################
