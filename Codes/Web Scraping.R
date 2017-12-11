@@ -19,7 +19,7 @@ sen_twitter_table <- readRDS('sen_twitter_table.rds')
 #install.packages("pdftools")
 #library(pdftools)
 house_twit_df <- read.csv('congress_twitter_acc.csv', header = TRUE, 
-                       stringsAsFactors = FALSE, skip = 2, encoding = 'UTF-8')
+                          stringsAsFactors = FALSE, skip = 2, encoding = 'UTF-8')
 house_twit_df$Representative <- stri_trans_general(house_twit_df$Representative, "Latin-ASCII")
 no_twit_acc <- c(1:nrow(house_twit_df))[-grep('@',house_twit_df$Twitter.Handle)]
 house_twit_df[no_twit_acc,]
@@ -67,20 +67,40 @@ house_party_df <- readRDS('house_party_df.rds')
 colnames(house_party_df)[2] <- "Representative"
 house_party_df$Representative <- as.character(house_party_df$Representative)
 house_party_df$Representative[c(443,444,445,446,447,448)] <- c("Amata Coleman Radewagen", "Eleanor Holmes Norton",
-                                                 "Madeleine Bordallo", "Gregorio Sablan", "Jenniffer Gonzalez",
-                                                 "Stacey Plaskett")
+                                                               "Madeleine Bordallo", "Gregorio Sablan", "Jenniffer Gonzalez",
+                                                               "Stacey Plaskett")
+
+#get rid of the "vacant" row
+house_party_df <- house_party_df[grep(' \\([RDI]\\)', house_party_df$Representative),]
+
+house_party_df$Party <- regexpr(' \\([RDI]\\)', house_party_df$Representative) %>% 
+  regmatches(house_party_df$Representative, .) %>% gsub(' ', '', .)
+
+#function that converts (R), (D), (I) to according political parties
+toParty <- function(house_df){
+  if (house_df == "(D)"){
+    house_df <- "Democrat"
+  } else if (house_df == "(R)"){
+    house_df <- "Republican"
+  } else {
+    house_df <- "Independent"
+  }
+  return (house_df)
+}
+
+house_party_df$Party <- lapply(house_party_df$Party, toParty)
 
 #rid of special accented characters
 house_party_df$Representative <- stri_trans_general(house_party_df$Representative, "Latin-ASCII")
+
 
 house_party_df$Representative <- 
   house_party_df$Representative %>%
   gsub(' \\([RDI]\\)(.)+', '', .) %>%
   gsub('[\\(\\)RDI .]+$', '', .) %>%
   gsub('at-large', '', ., ignore.case = TRUE) %>%
-  gsub('^[^[:alpha:]]+','',.)
-  
-  
-
-
-fuckk <- house_party_df
+  gsub('^[^[:alpha:]]+','',.) %>%
+  gsub('[.\']', '', .) %>%
+  gsub('^[:space:]+', '', .) %>%
+  gsub('[:space:]+$', '', .) %>%
+  gsub(' jr$', '', ., ignore.case = TRUE)

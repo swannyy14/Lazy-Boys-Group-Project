@@ -117,3 +117,14 @@ rownames(house_tweets_df) <- NULL
 # saveRDS(house_tweets_df, 'neel_house_tweets.rds') #NEEL
 # saveRDS(house_tweets_df, 'jaewon_house_tweets.rds') #JAEWON
 # saveRDS(house_tweets_df, 'john_house_tweets.rds') #JOHN
+
+#mine data for california shooting
+house_tweets_all_df <- readRDS("john_house_tweets_list.rds")
+
+house_tweets_cali_df <- lapply(house_tweets_all_df,
+                              function(x) pickDate(twListToDF(house_tweets_all_df),
+                                                   start_time = "2017-11-13 00:00:00 UTC",
+                                                   end_time = "2017-11-16 00:00:00 UTC")) %>%
+  do.call(rbind,.)
+house_tweets_cali_df <- pickDate(house_tweets_all_df,
+                                 start_time = "2017-11-13 00:00:00 UTC", end_time = "2017-11-16 00:00:00 UTC")
