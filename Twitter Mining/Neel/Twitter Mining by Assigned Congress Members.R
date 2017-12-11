@@ -55,7 +55,7 @@ house_twit_df$Representative <- gsub('delegate', '', house_twit_df$Representativ
 house_index_break <- length(house_twit_df$Twitter.Handle) %/% 3
 
 ##Neel
-#house_index <- 1:house_index_break
+# house_index <- 1:house_index_break
 
 ##Jaewon
 #house_index <- (house_index_break+1):(2*house_index_break)
