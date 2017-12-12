@@ -167,9 +167,7 @@ table(house_party_tweet_arr$Twitter.Handle)[which(table(house_party_tweet_arr$Tw
 delete_tweet_row <- c(85, 267, 82, 272, 266, 195, 196, 69)
 house_party_tweet_arr <- house_party_tweet_arr[-delete_tweet_row,]
 
-house_party_tweet_arr$Twitter.Handle[delete_tweet_row]
-
-#2. 
+# This data frame contains house members who are not classified
 not_included <- house_twit_df$Twitter.Handle[
   which(!(house_twit_df$Twitter.Handle %in% house_party_tweet_arr$Twitter.Handle))]
 length(not_included)

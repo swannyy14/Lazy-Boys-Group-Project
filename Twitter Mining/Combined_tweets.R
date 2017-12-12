@@ -78,7 +78,7 @@ complete_stripWhiteSpace <- function(x){ #completely strip all whitespaces at th
 }
 
 new_texas <- texas_tweets_df$text %>%
-  clean_tweet %>%
+  clean_tweet %>% #remove non graphic and unncessary characters
   tolower %>%
   stripWhitespace %>%
   removeNumbers %>%
@@ -96,8 +96,5 @@ as.character(new_texas_corpus[[2]])
 new_texas_dtm <- DocumentTermMatrix(new_texas_corpus)
 
 class(new_texas_dtm)
-summary(new_texas_dtm$)
-
-
 
 wordcloud(new_texas_corpus)
