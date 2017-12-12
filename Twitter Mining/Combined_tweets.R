@@ -32,27 +32,34 @@ clean_tweet <- function(x){ #function to remove non graphic characters, link, ha
     gsub("[[:punct:]]+", " ", .)      #remove punctuation
 }
 
+find_stem <- function(char_vec){ #function that finds stem of the words
+  vec_split <- strsplit(char_vec, "[[:space:]]+")[[1]]
+  for (i in 1:length(vec_split)){
+    hunspell_word <- hunspell_stem(vec_split[i])[[1]]
+    if (length(hunspell_word) != 0){
+      vec_split[i] <- hunspell_word[1]
+    }
+  }
+  return(paste(vec_split, collapse = ' '))
+}
+
+##maybe a function that corrects spelling errors first
+
+complete_stripWhiteSpace <- function(x){ #completely strip all whitespaces at the end of the character vectors
+  return_x <- gsub('^[[:space:]]+', '', x) %>% gsub('[[:space:]]+$', '', .)
+  return (return_x)
+}
+
 texas_tweets_df$text <- sapply(texas_tweets_df$text, clean_tweet) #clean up tweets
 
-texas_corpus <- Corpus(VectorSource(texas_tweets_df$text)) #convert tweets to a corpus
+texas_corpus <- VCorpus(VectorSource(texas_tweets_df$text)) #convert tweets to a corpus
 corpus.copy <- texas_corpus
 
-new_texas <- texas_corpus %>% tm_map(content_transformer(tolower)) %>% #all lower case
+new_texas <- texas_corpus %>% tm_map(tolower) %>% #all lower case
   tm_map(removeNumbers) %>% #remove numbers
   tm_map(replacePunct) %>% #replace punctuation with spaces
-  tm_map(removeWords, stopwords()) %>% #get rid of unnecessary stop words (and, or, etc)
-  tm_map(stemDocument) %>% #reduce words to their roots
-  tm_map(strsplit, ' ') %>%
-  tm_map(gsub, pattern = "[aeyuio]+$", replacement = "", x = .) %>%
-  tm_map(stemCompletion, dictionary = corpus.copy) %>%
-  tm_map(stripWhitespace)
+  tm_map(removeWords, stopwords()) %>% #find stem words
+  tm_map(find_stem) %>% 
+  tm_map(complete_stripWhiteSpace)
 
-stemCompletion(as.character(new_texas[[1]]), corpus.copy)
-
-lapply(new_texas, as.character)
-wordStem("heavy")
-
-stopwords()
-tm_map(texas_corpus, content_transformer(tolower))
-       
-getTransformations()
+inspect(new_texas)
