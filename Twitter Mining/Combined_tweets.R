@@ -5,6 +5,7 @@ setwd(source.dir)
 #install.packages('SnowballC')
 library(tm)
 library(SnowballC)
+library(dplyr)
 selected_cols <- c('text', 'favoriteCount', 'created', 'screenName', 'retweetCount')
 
 john_tweets_df <- readRDS("./John/john_house_tweets.rds") %>% select(selected_cols)
@@ -21,9 +22,9 @@ texas_tweets_df <- all_tweets_df[grep(paste(texas_keywords, collapse = "|"),
 texas_tweets_df$text <- sapply(texas_tweets_df$text,
                                function(x) iconv(x, "latin1", "ASCII", sub="")) %>% #to avoid error while using tm
   gsub('https.+$', '', .) %>% #remove links
+  gsub('&amp', '', .)
   gsub('@[[:alnum:]]+', '', .) %>% #remove twitter usernames
   gsub('#[[:alnum:]]+', '', .) #remove hashtags
-
 
 rownames(texas_tweets_df) <- NULL
 
@@ -31,7 +32,7 @@ replacePunct <- function(x){ #function to replace punctuation with space
   return(gsub("[[:punct:]]+", ' ', x))
 }
 
-texas_corpus <- VCorpus(VectorSource(texas_tweets_df$text)) #convert tweets to a corpus
+texas_corpus <- Corpus(VectorSource(texas_tweets_df$text)) #convert tweets to a corpus
 corpus.copy <- texas_corpus
 
 new_texas <- texas_corpus %>% tm_map(content_transformer(tolower)) %>% #all lower case
@@ -39,11 +40,14 @@ new_texas <- texas_corpus %>% tm_map(content_transformer(tolower)) %>% #all lowe
   tm_map(replacePunct) %>% #replace punctuation with spaces
   tm_map(removeWords, stopwords()) %>% #get rid of unnecessary stop words (and, or, etc)
   tm_map(stemDocument) %>% #reduce words to their roots
+  tm_map(strsplit, ' ') %>%
   tm_map(gsub, pattern = "[aeyuio]+$", replacement = "", x = .) %>%
   tm_map(stemCompletion, dictionary = corpus.copy) %>%
   tm_map(stripWhitespace)
 
-as.character(new_texas[[1]])
+stemCompletion(as.character(new_texas[[1]]), corpus.copy)
+
+lapply(new_texas, as.character)
 wordStem("heavy")
 
 stopwords()
