@@ -74,5 +74,4 @@ ggplot(react_tweet_avgs, aes(x = Party, y = log(fav_avg), fill = Party)) +
   scale_fill_manual(values=c('blue','red')) + ylab("Average Favorites")
 
 # jpeg("log_avg_favorite.jpg")
-  
 
