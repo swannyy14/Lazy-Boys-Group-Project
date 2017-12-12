@@ -3,9 +3,11 @@ setwd(source.dir)
 
 #install.packages("tm")
 #install.packages('SnowballC')
+#install.packages("hunspell")
 library(tm)
 library(SnowballC)
 library(dplyr)
+library(hunspell)
 selected_cols <- c('text', 'favoriteCount', 'created', 'screenName', 'retweetCount')
 
 john_tweets_df <- readRDS("./John/john_house_tweets.rds") %>% select(selected_cols)
@@ -18,19 +20,19 @@ texas_keywords <- c("heart", "pray", "texas", "attack", "violence", "shooting",
 
 texas_tweets_df <- all_tweets_df[grep(paste(texas_keywords, collapse = "|"),
                                       all_tweets_df$text, ignore.case = TRUE),]
+rownames(texas_tweets_df) <- NULL #make sure the row numbers are right
 
-texas_tweets_df$text <- sapply(texas_tweets_df$text,
-                               function(x) iconv(x, "latin1", "ASCII", sub="")) %>% #to avoid error while using tm
-  gsub('https.+$', '', .) %>% #remove links
-  gsub('&amp', '', .)
-  gsub('@[[:alnum:]]+', '', .) %>% #remove twitter usernames
-  gsub('#[[:alnum:]]+', '', .) #remove hashtags
-
-rownames(texas_tweets_df) <- NULL
-
-replacePunct <- function(x){ #function to replace punctuation with space
-  return(gsub("[[:punct:]]+", ' ', x))
+clean_tweet <- function(x){ #function to remove non graphic characters, link, hashtag, username
+  require(dplyr)
+  iconv(x, "latin1", "ASCII", sub = "") %>%
+    gsub('https.+$', '', .) %>%       #remove links
+    gsub('&amp', '', .) %>%           #remove &amp characters
+    gsub('@[[:alnum:]]+', '', .) %>%  #remove twitter usernames
+    gsub('#[[:alnum:]]+', '', .) %>%  #remove hashtags
+    gsub("[[:punct:]]+", " ", .)      #remove punctuation
 }
+
+texas_tweets_df$text <- sapply(texas_tweets_df$text, clean_tweet) #clean up tweets
 
 texas_corpus <- Corpus(VectorSource(texas_tweets_df$text)) #convert tweets to a corpus
 corpus.copy <- texas_corpus

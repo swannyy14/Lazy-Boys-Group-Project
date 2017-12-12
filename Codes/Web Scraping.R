@@ -5,6 +5,9 @@ library(dplyr)
 library(stringi)
 library(twitteR)
 
+source.dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(source.dir)
+
 ##### No need to run this code again (have the object saved)
 # # list of senators and their twitter accounts
 # # sen_twitter_url <- 'https://www.birdsonganalytics.com/blog/2017/02/21/full-list-of-us-senators-on-twitter-2017/'
