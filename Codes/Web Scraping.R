@@ -167,7 +167,9 @@ table(house_party_tweet_arr$Twitter.Handle)[which(table(house_party_tweet_arr$Tw
 #2. 
 not_included <- house_twit_df$Twitter.Handle[
   which(!(house_twit_df$Twitter.Handle %in% house_party_tweet_arr$Twitter.Handle))]
-
-grep(paste(not_included, collapse = "|") , house_twit_df$Twitter.Handle
+length(not_included)
+not_included_members <- data.frame(
+  house_twit_df[grepl(paste(not_included, collapse = "|") , house_twit_df$Twitter.Handle),],
+  party = rep(NA, length(not_included)))
 
 
