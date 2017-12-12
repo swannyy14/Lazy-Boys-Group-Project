@@ -150,7 +150,7 @@ sent1_plot1 <- ggplot(tweets_afinn_score, aes(x = Party, y = score, fill = Party
   geom_boxplot() +
   ggtitle("Score Distribution of\n sentiment by Party") + 
   stat_summary(fun.y = mean, colour = 'yellow', size = 2, geom='point') + 
-  scale_fill_manual(values=c('light blue','pink'))
+  scale_fill_manual(values = c('steelblue4', 'firebrick2'))
 
 sent1_plot2 <- ggplot(tweets_afscore_state, aes(x = State, y = avg_score, fill = State)) +
   geom_bar(stat = 'identity') +
@@ -159,8 +159,25 @@ sent1_plot2 <- ggplot(tweets_afscore_state, aes(x = State, y = avg_score, fill =
   theme(axis.text.x = element_text(angle = 75)) +
   theme(legend.position="none")
 
-#grid.arrange(sent1_plot1, sent1_plot2, ncol = 2, widths = 1:2)
+grid.arrange(sent1_plot1, sent1_plot2, ncol = 2, widths = 1:2)
 
 #jpeg("afinn score distributions.jpg")
 
 
+#use bing scoring
+nrc_rating <- get_sentiments('nrc')
+nrc_rating <- nrc_rating %>% filter(sentiment %in% c('fear', 'negative', 'sadness', 'anger', 'surprise', 'disgust'))
+
+colnames(nrc_rating) <- c("term", "sentiment")
+tweets_nrc <- inner_join(tweets_tidy, nrc_rating, by = 'term')
+tweets_nrc_party <- tweets_nrc %>% #count sentiment by party
+  group_by(Party, sentiment) %>% 
+  summarise(sentiment_count = n()) %>%
+  mutate(sentiment_proportion = sentiment_count/sum(sentiment_count))
+
+ggplot(tweets_nrc_party, aes(x = sentiment, y = sentiment_proportion, fill = Party)) +
+  geom_bar(stat = 'identity', position = 'dodge') +
+  scale_fill_manual(values = c('steelblue4', 'firebrick2')) +
+  ggtitle("Distribution of Sentiment by Party") +
+  ylab("Proportion") +
+  xlab("Sentiment")

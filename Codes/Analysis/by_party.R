@@ -71,7 +71,7 @@ react_tweet_avgs <- react_tweet %>% group_by(State, Party) %>% summarise(fav_avg
 
 ggplot(react_tweet_avgs, aes(x = Party, y = log(fav_avg), fill = Party)) +
   geom_bar(stat = "identity") + facet_wrap(~State) + ggtitle("Log of Average of Favorites by Party") +
-  scale_fill_manual(values=c('blue','red')) + ylab("Average Favorites")
+  scale_fill_manual(values = c('steelblue4', 'firebrick2')) + ylab("Average Favorites")
 
 # jpeg("log_avg_favorite.jpg")
 
