@@ -1,0 +1,33 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+```
+
+## R Markdown
+
+```{r}
+api_key <- "zYp6skKAnDmY7rBkBwxkLrQob"
+ 
+api_secret <- "NSmtcSKJVTut1BuPHBSQbFCPGYHXZcZahYqIUUAoyI2Cy1ghX1"
+
+access_token <- "792859800-QNTxyOt4TUSfwgS76YtA5jck3RDeKIZkJ2eU0Hcp"
+
+access_token_secret <- "rIJ5QNMpcSxUpqMBjT83BrchKSXxTe16DPlnGiHlrpho4"
+
+setup_twitter_oauth(api_key, api_secret)
+
+##saves searchTwitter to variable, we piped twListToDF() which takes objects from the list and returns it via data frame
+prayForTexas <- searchTwitter('#prayfortexas') %>% twListToDF()
+
+##function that returns structure of object, works only while twitter1 is in list format
+##str(twitter1[[1]])
+
+```
+
+
+

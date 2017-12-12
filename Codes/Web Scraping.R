@@ -160,9 +160,14 @@ house_party_tweet_arr <- arrange(house_party_tweet, State, Last, First.x, First.
 
 #NA.omit
 house_party_tweet_arr <- na.omit(house_party_tweet_arr)
+rownames(house_party_tweet_arr) <- NULL
 
 #1. remove duplicate twitter accounts (gotta remove the right rows)
 table(house_party_tweet_arr$Twitter.Handle)[which(table(house_party_tweet_arr$Twitter.Handle) > 1)]
+delete_tweet_row <- c(85, 267, 82, 272, 266, 195, 196, 69)
+house_party_tweet_arr <- house_party_tweet_arr[-delete_tweet_row,]
+
+house_party_tweet_arr$Twitter.Handle[delete_tweet_row]
 
 #2. 
 not_included <- house_twit_df$Twitter.Handle[
@@ -171,5 +176,25 @@ length(not_included)
 not_included_members <- data.frame(
   house_twit_df[grepl(paste(not_included, collapse = "|") , house_twit_df$Twitter.Handle),],
   party = rep(NA, length(not_included)))
-
+rownames(not_included_members) <- NULL
+not_included_members$party <- 
+  c('R', 'R', 'R', 'R', 'D', 'R', 'R',
+    'R', 'D', 'D', 'D', 'D', 'D', 'D',
+    'D', 'D', 'R', 'R', 'D', 'R', 'D',
+    'D', 'R', 'D', 'D', 'R', 'D', 'D', 
+    'D', 'D', 'D', 'D', 'D', 'D', 'R',
+    'D', 'D', 'R', 'R', 'D', 'R', 'D',
+    'R', 'R', 'R', 'D', 'R', 'R', 'D', 
+    'D', 'D', 'R', 'D', 'R', 'D', 'R', 
+    'R', 'R', 'R', 'R', 'R', 'R', 'R', 
+    'R', 'R', 'D', 'D', 'R', 'D', 'D',
+    'D', 'R', 'D', 'R', 'D', 'D', 'R',
+    'R', 'R', 'D', 'R', 'D', 'R', 'D',
+    'D', 'D', 'R', 'D', 'D', 'R', 'D',
+    'D', 'D', 'D', 'D', 'R', 'R', 'R',
+    'R', 'R', 'R', 'R', 'R', 'R', 'D',
+    'D', 'R', 'D', 'D', 'D', 'R', 'R',
+    'R', 'R', 'R', 'R', 'D', 'D', 'R',
+    'R', 'R', 'R', 'R', 'R', 'R', 'R',
+    'D', 'D', 'D', 'R', 'R', 'D', 'R')
 
