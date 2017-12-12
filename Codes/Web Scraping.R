@@ -141,8 +141,16 @@ twit_last <- sub("^[[:alpha:]]+[[:space:]]", "", twit_middle_last)
 twit_last <- sub("^[[:alpha:]]+[[:punct:]]", "", twit_last)
 
 #Divide Name Column
-house_party_df<-data.frame(State=house_party_df$State, First = party_first, Last = party_last, Party = house_party_df$Party)
-house_twit_df<-data.frame(State=house_twit_df$State, First = twit_first, Last = twit_last, Twitter.Handle = house_twit_df$Twitter.Handle)
+house_party_df <- data.frame(State=house_party_df$State,
+                             First = party_first,
+                             Last = party_last,
+                             Party = house_party_df$Party,
+                             stringsAsFactors = FALSE)
+house_twit_df <- data.frame(State=house_twit_df$State,
+                            First = twit_first,
+                            Last = twit_last,
+                            Twitter.Handle = house_twit_df$Twitter.Handle,
+                            stringsAsFactors = FALSE)
 
 #FULL JOIN
 house_party_tweet <- dplyr::full_join(house_party_df, house_twit_df, by = c("State","Last"))
@@ -152,3 +160,14 @@ house_party_tweet_arr <- arrange(house_party_tweet, State, Last, First.x, First.
 
 #NA.omit
 house_party_tweet_arr <- na.omit(house_party_tweet_arr)
+
+#1. remove duplicate twitter accounts (gotta remove the right rows)
+table(house_party_tweet_arr$Twitter.Handle)[which(table(house_party_tweet_arr$Twitter.Handle) > 1)]
+
+#2. 
+not_included <- house_twit_df$Twitter.Handle[
+  which(!(house_twit_df$Twitter.Handle %in% house_party_tweet_arr$Twitter.Handle))]
+
+grep(paste(not_included, collapse = "|") , house_twit_df$Twitter.Handle
+
+
