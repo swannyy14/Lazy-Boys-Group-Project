@@ -32,6 +32,10 @@ clean_tweet <- function(x){ #function to remove non graphic characters, link, ha
     gsub("[[:punct:]]+", " ", .)      #remove punctuation
 }
 
+change_trivial <- function(char_vec){
+  
+}
+
 find_stem <- function(char_vec){ #function that finds stem of the words
   vec_split <- strsplit(char_vec, "[[:space:]]+")[[1]]
   for (i in 1:length(vec_split)){
@@ -59,7 +63,9 @@ new_texas <- texas_corpus %>% tm_map(tolower) %>% #all lower case
   tm_map(removeNumbers) %>% #remove numbers
   tm_map(replacePunct) %>% #replace punctuation with spaces
   tm_map(removeWords, stopwords()) %>% #find stem words
+  tm_map(complete_stripWhiteSpace) %>%
+  tm_map(stripWhitespace) %>%
   tm_map(find_stem) %>% 
-  tm_map(complete_stripWhiteSpace)
+  tm_map()
 
 inspect(new_texas)
