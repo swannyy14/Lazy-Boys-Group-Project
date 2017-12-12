@@ -4,10 +4,16 @@ setwd(source.dir)
 #install.packages("tm")
 #install.packages('SnowballC')
 #install.packages("hunspell")
+#install.packages("RColorBrewer")
+#install.packages("wordcloud")
+
 library(tm)
 library(SnowballC)
 library(dplyr)
 library(hunspell)
+library(wordcloud)
+library(RColorBrewer)
+
 selected_cols <- c('text', 'favoriteCount', 'created', 'screenName', 'retweetCount')
 
 john_tweets_df <- readRDS("./John/john_house_tweets.rds") %>% select(selected_cols)
@@ -24,16 +30,19 @@ rownames(texas_tweets_df) <- NULL #make sure the row numbers are right
 
 clean_tweet <- function(x){ #function to remove non graphic characters, link, hashtag, username
   require(dplyr)
-  iconv(x, "latin1", "ASCII", sub = "") %>%
+  return_vec <- iconv(x, "latin1", "ASCII", sub = "") %>%
     gsub('https.+$', '', .) %>%       #remove links
     gsub('&amp', '', .) %>%           #remove &amp characters
     gsub('@[[:alnum:]]+', '', .) %>%  #remove twitter usernames
     gsub('#[[:alnum:]]+', '', .) %>%  #remove hashtags
     gsub("[[:punct:]]+", " ", .)      #remove punctuation
+  return (return_vec)
 }
 
-change_trivial <- function(char_vec){
-  
+change_trivial <- function(char_vec){ #make trivial changes to avoid unwanted outcomes
+  return_vec <- gsub('texas', 'Texas', char_vec) %>%
+    gsub(' w ', '', .)
+  return (return_vec)
 }
 
 find_stem <- function(char_vec){ #function that finds stem of the words
@@ -47,25 +56,48 @@ find_stem <- function(char_vec){ #function that finds stem of the words
   return(paste(vec_split, collapse = ' '))
 }
 
+hunspell_correction <- function(char_vec){ #function that decides which word needs correction, and chooses first suggestion
+  vec_split <- strsplit(char_vec, "[[:space:]]+")[[1]]
+  need_correction <- which(hunspell_check(vec_split) == FALSE)
+  for (i in need_correction){
+    corrected <- hunspell_suggest(as.character(vec_split[i]))[[1]]
+    if (length(corrected) != 0){
+      vec_split[i] <- corrected[1]
+    }
+  }
+  return (paste(vec_split, collapse = ' '))
+}
+
 ##maybe a function that corrects spelling errors first
 
 complete_stripWhiteSpace <- function(x){ #completely strip all whitespaces at the end of the character vectors
-  return_x <- gsub('^[[:space:]]+', '', x) %>% gsub('[[:space:]]+$', '', .)
+  return_x <- gsub('^[[:space:]]+', '', x) %>% 
+    gsub('[[:space:]]+$', '', .) %>%
+    gsub('[\n\t]', '', .)
   return (return_x)
 }
 
-texas_tweets_df$text <- sapply(texas_tweets_df$text, clean_tweet) #clean up tweets
+new_texas <- texas_tweets_df$text %>%
+  clean_tweet %>%
+  tolower %>%
+  stripWhitespace %>%
+  removeNumbers %>%
+  removeWords(words = stopwords()) %>%
+  complete_stripWhiteSpace %>%
+  sapply(find_stem, USE.NAMES = FALSE) %>%
+  change_trivial %>%
+  sapply(hunspell_correction, USE.NAMES = FALSE)
 
-texas_corpus <- VCorpus(VectorSource(texas_tweets_df$text)) #convert tweets to a corpus
-corpus.copy <- texas_corpus
+new_texas_corpus <- VCorpus(VectorSource(new_texas)) #convert tweets to a corpus
+inspect(new_texas_corpus)
 
-new_texas <- texas_corpus %>% tm_map(tolower) %>% #all lower case
-  tm_map(removeNumbers) %>% #remove numbers
-  tm_map(replacePunct) %>% #replace punctuation with spaces
-  tm_map(removeWords, stopwords()) %>% #find stem words
-  tm_map(complete_stripWhiteSpace) %>%
-  tm_map(stripWhitespace) %>%
-  tm_map(find_stem) %>% 
-  tm_map()
+as.character(new_texas_corpus[[2]])
 
-inspect(new_texas)
+new_texas_dtm <- DocumentTermMatrix(new_texas_corpus)
+
+class(new_texas_dtm)
+summary(new_texas_dtm$)
+
+
+
+wordcloud(new_texas_corpus)
