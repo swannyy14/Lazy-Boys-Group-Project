@@ -167,7 +167,7 @@ table(house_party_tweet_arr$Twitter.Handle)[which(table(house_party_tweet_arr$Tw
 delete_tweet_row <- c(85, 267, 82, 272, 266, 195, 196, 69)
 house_party_tweet_arr <- house_party_tweet_arr[-delete_tweet_row,]
 
-# This data frame contains house members who are not classified
+#2. This data frame contains house members who are not classified
 not_included <- house_twit_df$Twitter.Handle[
   which(!(house_twit_df$Twitter.Handle %in% house_party_tweet_arr$Twitter.Handle))]
 length(not_included)
@@ -196,3 +196,32 @@ not_included_members$party <-
     'R', 'R', 'R', 'R', 'R', 'R', 'R',
     'D', 'D', 'D', 'R', 'R', 'D', 'R')
 
+
+#now we don't need the names (first, last) of the house members. Get rid of those,
+#and bind house_party_tweet_arr and not_included_member dataframes
+h_twitt_acc <- subset(house_party_tweet_arr, select = -c(First.x, Last, First.y))
+h_twitt_acc$Party <- factor(h_twitt_acc$Party, levels = c("Democrat", "Republican", "Independent"))
+
+party_levels <- levels(h_twitt_acc$Party)
+
+not_included_members$party <- factor(not_included_members$party, #refactor the party levels
+                                     levels = c("D","R","I"), labels = party_levels)
+not_included_members <- subset(not_included_members, select = -c(First, Last))
+colnames(not_included_members) <- c("State", "Twitter.Handle", "Party")
+
+final_h_twitt_acc <- rbind(h_twitt_acc, not_included_members) %>% arrange(State)
+
+rownames(h_twitt_acc) <- NULL
+
+final_sen_twitt_acc <- subset(sen_twitter_table, select = -Real.Name)
+final_sen_twitt_acc$State[which(final_sen_twitt_acc$State == "Indianna")] <- rep("Indiana", 2)
+final_sen_twitt_acc$State <- factor(final_sen_twitt_acc$State,
+                                    levels = state.name, labels = state.abb)
+
+all_twit <- rbind(final_h_twitt_acc, final_sen_twitt_acc)
+all_twit$State <- factor(all_twit$State,
+                         levels = c(state.abb, 'AS', 'DC', 'PR', 'VI'),
+                         labels = c(state.name, 'American Samoa', 'District of Columbia', 
+                                    'Puerto Rico', 'Virgin Islands'))
+
+saveRDS(all_twit, "./Analysis/all_twitter.rds")
