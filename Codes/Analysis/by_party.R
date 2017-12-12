@@ -75,3 +75,17 @@ ggplot(react_tweet_avgs, aes(x = Party, y = log(fav_avg), fill = Party)) +
 
 # jpeg("log_avg_favorite.jpg")
 
+
+corpus_rep <- Corpus(VectorSource(iconv(react_rep_tweet$text, "latin1", "ASCII", sub="")))
+skipWords <- function(x) removeWords(x, stopwords("english"))
+funcs <- list(tolower, removePunctuation, removeNumbers, stripWhitespace, skipWords)
+a <- tm_map(corpus_rep, FUN = tm_reduce, tmFuns = funcs)
+a.dtm1 <- TermDocumentMatrix(a, control = list(wordLengths = c(3,10))) 
+findFreqTerms(a.dtm1, 10)
+
+corpus_dem <- Corpus(VectorSource(iconv(react_dem_tweet$text, "latin1", "ASCII", sub="")))
+skipWords <- function(x) removeWords(x, stopwords("english"))
+funcs <- list(tolower, removePunctuation, removeNumbers, stripWhitespace, skipWords)
+a <- tm_map(corpus_dem, FUN = tm_reduce, tmFuns = funcs)
+a.dtm1 <- TermDocumentMatrix(a, control = list(wordLengths = c(3,10))) 
+findFreqTerms(a.dtm1, 10)
