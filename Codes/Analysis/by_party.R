@@ -41,6 +41,24 @@ react_rate_dem <- nrow(react_dem_tweet)/nrow(tweets_party_dem)
 like_per_post_rep <- sum(react_rep_tweet$favoriteCount)/nrow(react_rep_tweet)
 like_per_post_dem <- sum(react_dem_tweet$favoriteCount)/nrow(react_dem_tweet)
 
+#Most famous post by party
+famous<-which.max(react_rep_tweet$favoriteCount)
+react_rep_tweet[famous,]$text
+react_rep_tweet[famous,]$favoriteCount
+react_rep_tweet[famous,]$State
 
+#Most famous post by party
+famous<-which.max(react_dem_tweet$favoriteCount)
+react_dem_tweet[famous,]$text
+react_dem_tweet[famous,]$favoriteCount
+react_dem_tweet[famous,]$State
 
+tx_tweets <- tweets_party[tweets_party$State=="Texas",]
+tx_tweets_rep <-filter(tx_tweets, Party == "Republican")
+tx_tweets_dem <-filter(tx_tweets, Party == "Democrat")
 
+react_tx_rep <- na.omit(tx_tweets_rep)
+react_tx_dem <- na.omit(tx_tweets_dem)
+
+nrow(react_tx_rep)/nrow(tx_tweets_rep)
+nrow(react_tx_dem)/nrow(tx_tweets_dem)
